@@ -1,6 +1,6 @@
 <?php
 
-
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -17,8 +17,7 @@ class Task
     public bool $completed,
     public string $created_at,
     public string $updated_at
-  ) {
-  }
+  ) {}
 }
 $tasks = [
   new Task(
@@ -43,10 +42,10 @@ $tasks = [
     3,
     'Learn programming',
     'Task 3 description',
-    'Task 3 long description',
-    true,
-    '2023-03-03 12:00:00',
-    '2023-03-03 12:00:00'
+    long_description: 'Task 3 long description',
+    completed: true,
+    created_at: '2023-03-03 12:00:00',
+    updated_at: '2023-03-03 12:00:00'
   ),
   new Task(
     4,
@@ -59,13 +58,24 @@ $tasks = [
   ),
 ];
 
-Route::get('/', function () use ($tasks){
-    // return "hello Word";
-    return view('index', ['tasks' => $tasks]);
-})->name('task.list');
+Route::get('/', function () {
+  return redirect()->route('tasks.list');
+});
 
-Route::get('/{task_id}', function($task_id) {
-    return "There are task Detail";
+Route::get('/tasks', function () use ($tasks) {
+  // return "hello Word";
+  return view('index', ['tasks' => $tasks]);
+})->name('tasks.list');
+
+Route::get('task/{task_id}', function ($task_id) use ($tasks) {
+  $task = collect($tasks)->firstWhere('id', $task_id);
+
+   if (!$task) { 
+     abort(Response::HTTP_NOT_FOUND);
+   }
+
+   return view('taskDetail', ['task'=> $task]);
+  // return "There are task Detail";
 })->name('tasks.show');
 
 // Route::get('/hello', function () {
