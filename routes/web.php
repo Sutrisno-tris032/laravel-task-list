@@ -36,6 +36,23 @@ Route::post('/task/store', function (Request $request) {
 
 })->name('tasks.store');
 
+Route::put('/task/{id}/update', function ($id, Request $request) {
+  $data = $request->validate([
+   'title' => 'required|max:255',
+   'description' => 'required',
+   'long_description' => 'required'
+  ]);
+  
+  $task = ModelsTask::findOrFail($id);
+  $task->title = $data['title'];
+  $task->description = $data['description'];
+  $task->long_description = $data['long_description'];
+  $task->save();
+  
+  return redirect()->route('tasks.list');
+
+})->name('tasks.update');
+
 Route::get('task/{task_id}/edit', function ($id) {
   return view('editTask', [
     'task' => ModelsTask::findOrFail($id)
